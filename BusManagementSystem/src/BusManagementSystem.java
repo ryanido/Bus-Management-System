@@ -9,6 +9,7 @@ import java.util.HashMap;
 //Dfs doesnt provide shortest path only a path
 public class BusManagementSystem {
 	
+	public static final int NUMBER_OF_STOPS = 8757;
 	public static void main(String[] args) {
 		HashMap mappedID = mapStops();
 		System.out.print(mappedID.get("8283"));

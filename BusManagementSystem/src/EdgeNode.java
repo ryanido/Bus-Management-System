@@ -1,6 +1,7 @@
 
 public class EdgeNode {
-	int stopNumber;
+	String stopID;
+	int mappedID;
 	int weight;
 	EdgeNode next;
 }
