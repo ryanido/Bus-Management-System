@@ -8,12 +8,12 @@ import java.util.Queue;
 
 
 public class Graph {
-	public int nvertices; //number of vertices
-	public boolean[] discovered; // array for vertices discovered but not processed
-	public boolean[] processed; // array for vertices processed
-	public int[] parents; // array for parents(vertex preceding) of each vertex
-	public EdgeNode[] edges;// array for each edge
-	public HashMap<String,Integer> mappedIDs; // hashmap of stopID to position in array
+	private int nvertices; //number of vertices
+	private boolean[] discovered; // array for vertices discovered but not processed
+	private boolean[] processed; // array for vertices processed
+	private int[] parents; // array for parents(vertex preceding) of each vertex
+	private EdgeNode[] edges;// array for each edge
+	private HashMap<String,Integer> mappedIDs; // hashmap of stopID to position in array
 	
 	public Graph()
 	{
@@ -44,7 +44,14 @@ public class Graph {
 			e.printStackTrace();
 		}
 	}
-	
+	//add Edge to graph
+	public void addEdge(String start, String end,int weight)
+	{
+		EdgeNode tmp = new EdgeNode(end,weight,this.mappedIDs.get(end));
+		int startIndex = this.mappedIDs.get(start);
+		tmp.next = this.edges[startIndex];
+		this.edges[startIndex] = tmp;
+	}
 	//Depth First Search Method
 	public void dfs(int start)
 	{
