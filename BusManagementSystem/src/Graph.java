@@ -1,17 +1,48 @@
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
 
 
 public class Graph {
-	int nvertices; //number of vertices
-	boolean[] discovered; 
-	boolean[] processed;
-	int[] parents;
-	EdgeNode[] edges;
+	public int nvertices; //number of vertices
+	public boolean[] discovered; // array for vertices discovered but not processed
+	public boolean[] processed; // array for vertices processed
+	public int[] parents; // array for parents(vertex preceding) of each vertex
+	public EdgeNode[] edges;// array for each edge
+	public HashMap<String,Integer> mappedIDs; // hashmap of stopID to position in array
 	
-	public Graph(int nvertices)
+	public Graph()
 	{
-		
+		BufferedReader reader;
+		this.nvertices = 0;
+		try {
+			//Map StopID's to consecutive numbers to optimize space used by Adjacency list 
+			reader = new BufferedReader(new FileReader("stops.txt"));
+			String line;
+			String stopID;
+			reader.readLine();
+			for(int index = 0; (line = reader.readLine()) != null; index++)
+			{
+				stopID= line.split(",")[0];
+				(this.mappedIDs).put(stopID, index);
+				this.nvertices++;
+			}
+			//Initialize all arrays to appropriate length
+			this.edges = new EdgeNode[nvertices];
+			this.discovered = new boolean[nvertices];
+			this.processed = new boolean[nvertices];
+			this.parents = new int[nvertices];
+			reader.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	//Depth First Search Method
