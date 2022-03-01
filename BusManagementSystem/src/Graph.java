@@ -4,6 +4,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.PriorityQueue;
 import java.util.Queue;
 
 
@@ -13,6 +14,7 @@ public class Graph {
 	private boolean[] processed; // array for vertices processed
 	private int[] parents; // array for parents(vertex preceding) of each vertex
 	private EdgeNode[] edges;// array for each edge
+	private double[] distTo;//array for distance to each edge 
 	private HashMap<String,Integer> mappedIDs; // hashmap of stopID to position in array
 	
 	public Graph()
@@ -36,6 +38,7 @@ public class Graph {
 			this.discovered = new boolean[nvertices];
 			this.processed = new boolean[nvertices];
 			this.parents = new int[nvertices];
+			this.distTo = new double[nvertices];
 			reader.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -108,7 +111,38 @@ public class Graph {
 		{
 			discovered[i] = false;
 			processed[i] = false;
-			parents[i] = -1;		
+			parents[i] = -1;
+			distTo[i] = Double.POSITIVE_INFINITY;
+		}
+	}
+	
+	//Djikstra shortest path
+	public void Djikstra(int start,int end)
+	{
+		initSearch();
+		BinaryHeap pq = new BinaryHeap(nvertices);
+		int v,y; // parent and child points on graph
+		v = start;
+		distTo[v] = 0;
+		relax(v,pq);
+		y = pq.deleteMax();
+		while(!pq.isEmpty() && y != end) //
+		{
+			relax(y,pq);
+			y = pq.deleteMax();
+		}
+	}
+	
+	public void relax(int v, BinaryHeap pq) // pq
+	{
+		for(EdgeNode tmp = this.edges[v]; tmp != null; tmp = tmp.next)
+		{
+			int w = tmp.mappedID;
+			if(distTo[w] > distTo[v] + tmp.weight) {
+				distTo[w] = distTo[v] + tmp.weight;
+				parents[w] = v;
+			}
+			pq.insert(tmp.weight, tmp.mappedID);
 		}
 	}
 }
