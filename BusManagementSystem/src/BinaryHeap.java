@@ -1,92 +1,91 @@
+import java.util.HashMap;
 
 public class BinaryHeap {
-	private int size;
-	private double[] values;
 	private int n;
-	private int[] keys;
-	public BinaryHeap(int size)
-	{
+	private double[] keys;
+	private int[] values;
+	private int size;
+	HashMap<Integer,Integer> pos;
+	
+	public BinaryHeap(int size){
+		this.keys = new double[size];
+		this.values = new int[size];
 		this.size = size;
-		this.values = new double[size];
 		this.n = 0;
-		this.keys = new int[size];
 	}
 	
-	public boolean isEmpty() {
-		return this.n == 0;
-	}
-	public void insert(double v, int id) {
-		if(n  <= size)
-		{
-			this.values[n] = v;
-			this.keys[n] = id;
-			bubbleup(++n);
-		}
-		else
-		{
-			System.out.println("Too big");
-		}
-	}
-	
-	public int deleteMax() {
-		int max = keys[0];
-		values[0] = values[n -1];
-		keys[0] = keys[n - 1];
-		values[--n] = 0;
-		keys[--n] = -1;
-		bubbledown(1);
-		return max;
-	}
-	
-	public int parentOf(int index) {
-		if(index == 1)
-		{
-			return -1;
-		}
-		return index/2;
-	}
-	
-	public int childOf(int index) {
-		if(2*index > n) 
-		{
-			return -1;
-		}
-		else if(2*index + 1 > n)
-		{
-			return 2*index;
-		}
-		return values[2 * index -1] > values[2 * index] ? 2 * index  : 2 * index + 1;
-	}
-	
-	public void bubbleup(int c) {
-		if(parentOf(c) != -1 && values[c - 1] > values[parentOf(c) - 1])
-		{
-			int x = parentOf(c);
-			swap(c,parentOf(c));
-			bubbleup(x);
-		}
-	}
-	
-	public void swap(int x, int y)
+	public void insert(double key, int value)
 	{
-		x--;
-		y--;
-		double tmp = values[x];
-		values[x] = values[y];
-		values[y] = tmp;
-		int key = keys[x];
-		keys[x] = keys[y];
-		keys[y] = key;
+		if(pos.containsKey(value))
+		{
+			keys[pos.get(value)] = key;
+			bubbledown(pos.get(value));
+			return;
+		}
+		keys[n] = key;
+		values[n] = value;
+		pos.put(values[n],n);
+		bubbleup(n++);
 	}
 	
-	public void bubbledown(int p) {
-		if(childOf(p) != -1 && values[p - 1] < values[childOf(p) - 1])
+	public int delMin()
+	{
+		int min = values[0];
+		swap(0,--n);
+		bubbledown(0);
+		keys[n] = Double.MAX_VALUE;
+		values[n] = Integer.MAX_VALUE;
+		return min;
+	}
+	
+	private int childOf(int p)
+	{
+		if(2*p + 1 > n - 1) return -1;
+		if(2*p + 2 > n - 1) return 2*p + 1;
+		return keys[2*p + 1] < keys[2*p + 2] ? 2*p + 1 : 2*p + 2;
+	}
+	
+	private int parentOf(int c)
+	{
+		return (c % 2 == 1) ? c/2: c/2 - 1;
+	}
+	
+	private void swap(int x, int y)
+	{
+		double k = keys[x];
+		keys[x] = keys[y];
+		keys[y] = k;
+		int v = values[x];
+		values[x] = values[y];
+		values[y] = v;
+		pos.put(values[x], x);
+		pos.put(values[y], x);
+	}
+	
+	private void bubbledown(int n)
+	{
+		int c = childOf(n);
+		if(c == -1) return;
+		if(keys[n] > keys[c])
 		{
-			int x = childOf(p);
-			swap(p,childOf(p));
-			bubbledown(x);
+			swap(n,c);
+			bubbledown(c);
+		}
+	}
+	
+	private void bubbleup(int n)
+	{
+		int p = parentOf(n);
+		if(p == -1) return;
+		if(keys[n] < keys[p])
+		{
+			swap(n,p);
+			bubbleup(p);
 		}
 	}
 
-
+	public boolean isEmpty() {
+		return n <= 0;
+	}
+	
 }
