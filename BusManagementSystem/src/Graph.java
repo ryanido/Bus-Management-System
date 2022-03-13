@@ -16,12 +16,12 @@ public class Graph {
 	private HashMap<Integer, Double> stopLons;// HashMap for stop longitude
 	private BinaryHeap pq;
 
-	public Graph() {
+	public Graph(String stops, String transfers, String stopTimes) {
 		BufferedReader reader;
 		this.nvertices = 0;
 		this.nedges = 0;
 		try {
-			reader = new BufferedReader(new FileReader("stops.txt"));
+			reader = new BufferedReader(new FileReader(stops));
 			String line;
 			String lineB;
 			String stopName;
@@ -51,7 +51,7 @@ public class Graph {
 			}
 			// Adding edges from transfers.txt
 			reader.close();
-			reader = new BufferedReader(new FileReader("transfers.txt"));
+			reader = new BufferedReader(new FileReader(transfers));
 			reader.readLine();
 			int from;
 			int to;
@@ -68,7 +68,7 @@ public class Graph {
 			}
 			// Adding edges from stop_times.txt
 			reader.close();
-			reader = new BufferedReader(new FileReader("stop_times.txt"));
+			reader = new BufferedReader(new FileReader(stopTimes));
 			reader.readLine();
 			line = reader.readLine();
 			int tripIDA;
@@ -142,8 +142,8 @@ public class Graph {
 			relax(v);
 		}
 		if (processed.get(end)) {
-			System.out.println("Here is the route \nFrom:" + start + ":" + stopNames.get(start) + "\n" + "To" + ":"
-					+ end + ":" + stopNames.get(end) + "\n" + "Cost:" + distTo.get(end));
+			System.out.printf("\nHere is the route \nFrom:" + start + ":" + stopNames.get(start) + "\n" + "To" + ":"
+					+ end + ":" + stopNames.get(end) + "\n" + "Cost: %2d",distTo.get(end));
 			printPath(start, end);
 			return true;
 		}
