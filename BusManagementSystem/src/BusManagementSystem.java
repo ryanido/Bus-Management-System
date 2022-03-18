@@ -10,7 +10,6 @@ import java.util.Scanner;
 
 //Notes for report:
 //Graph Sparse Adjancency list
-//Dfs doesnt provide shortest path only a path
 public class BusManagementSystem {
 	public static boolean quit = false;
 	public static final String STOPS = "stops.txt";
@@ -33,13 +32,14 @@ public class BusManagementSystem {
 				+ "\nEnter 1 to search for bus stops by name \n" + "Enter 2 to search for trips by arrival time \n"
 				+ "Enter 3 to find the shortest path between 2 stops \n" + "Enter 'quit' to quit \n"
 				+ "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n");
-		if (input.hasNext("1"))
+		String path = input.nextLine();
+		if (path.equals("1"))
 			stopSearch();
-		else if (input.hasNext("2"))
+		else if (path.equals("2"))
 			tripSearch();
-		else if (input.hasNext("3"))
+		else if (path.equals("3"))
 			shortestPath();
-		else if (input.hasNext("quit"))
+		else if (path.equals("quit"))
 			quit = true;
 		else
 			System.out.println("Please enter a valid input");
@@ -52,6 +52,7 @@ public class BusManagementSystem {
 		boolean done = false; // Boolean for if user is done
 		int start; // start stop
 		int end; // end stop
+		String path;
 		while (!done) {
 			try {
 				Scanner input = new Scanner(System.in);
@@ -65,15 +66,17 @@ public class BusManagementSystem {
 									: (end + " is not a valid stop ID")));
 					System.out.printf("Enter 'r' if you would like to try again" + "\n"
 							+ "Enter 'h' to return to the homepage" + "\n" + "Enter 'quit' to quit \n");
-					while (!input.hasNext("r")) {
-						if (input.hasNext("quit")) {
+					input.next();
+					path = input.nextLine();
+					while (!path.equals("r")) {
+						if (path.equals("quit")) {
 							quit = true;
 							return;
-						} else if (input.hasNext("h")) {
+						} else if (path.equals("h")) {
 							return;
 						}
-						System.out.println("Please enter a valid input\n");
-						input.nextLine();
+						System.out.println("Please enter a valid input");
+						path = input.nextLine();
 					}
 
 				} else {
@@ -83,12 +86,14 @@ public class BusManagementSystem {
 					}
 					System.out.printf("Enter 'r' if you would like to enter different inputs \n"
 							+ "Enter 'h' to return to the home page \n");
-					while (!input.hasNext("r")) {
-						if (input.hasNext("h")) {
+					input.next();
+					path = input.nextLine();
+					while (!path.equals("r")) {
+						if (path.equals("h")) {
 							return;
 						}
 						System.out.println("Please enter a valid input");
-						input.nextLine();
+						path = input.nextLine();
 					}
 				}
 			} catch (InputMismatchException e) {
@@ -106,6 +111,7 @@ public class BusManagementSystem {
 		int h; // Arrival hour
 		int m; // Arrival minute
 		int s; // Arrival second
+		String path;
 		TripDatabase trips;
 		while (!done) {
 			try {
@@ -127,33 +133,49 @@ public class BusManagementSystem {
 					}
 					System.out.printf("Enter 'r' if you would like to enter different inputs \n"
 							+ "Enter 'h' to return to the home page \n");
-					while (!input.hasNext("r")) {
-						if (input.hasNext("h")) {
+					input.next();
+					path = input.nextLine();
+					while (!path.equals("r")) {
+						if (path.equals("h")) {
 							return;
-						} else {
-							System.out.println("Please enter a valid input");
-							input.nextLine();
 						}
+						System.out.println("Please enter a valid input");
+						path = input.nextLine();
 					}
 				} else {
 					System.out.println("Please enter a valid input in the format HH:MM:SS");
 					System.out.printf("Enter 'r' if you would like to try again" + "\n"
 							+ "Enter 'h' to return to the homepage" + "\n" + "Enter 'quit' to quit \n");
-
-					while (!input.hasNext("r")) {
-						if (input.hasNext("quit")) {
+					input.next();
+					path = input.nextLine();
+					while (!path.equals("r")) {
+						if (path.equals("quit")) {
 							quit = true;
 							return;
-						} else if (input.hasNext("h")) {
+						} else if (path.equals("h")) {
 							return;
-						} else {
-							System.out.println("Please enter a valid input");
-							input.nextLine();
 						}
+						System.out.println("Please enter a valid input");
+						path = input.nextLine();
 					}
 				}
 			} catch (NumberFormatException e) {
+				Scanner input = new Scanner(System.in);
 				System.out.println("Please enter a valid input in the format HH:MM:SS");
+				System.out.printf("Enter 'r' if you would like to try again" + "\n"
+						+ "Enter 'h' to return to the homepage" + "\n" + "Enter 'quit' to quit \n");
+				input.next();
+				path = input.nextLine();
+				while (!path.equals("r")) {
+					if (path.equals("quit")) {
+						quit = true;
+						return;
+					} else if (path.equals("h")) {
+						return;
+					}
+					System.out.println("Please enter a valid input");
+					path = input.nextLine();
+				}
 			}
 		}
 
