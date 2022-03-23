@@ -64,40 +64,17 @@ public class BusManagementSystem {
 							? (start + " and " + end + " are not valid stop IDs")
 							: !CITY_GRAPH.contains(start) ? (start + " is not a valid stop ID")
 									: (end + " is not a valid stop ID")));
-					System.out.printf("Enter 'r' if you would like to try again" + "\n"
-							+ "Enter 'h' to return to the homepage" + "\n" + "Enter 'quit' to quit \n");
-					input.next();
-					path = input.nextLine();
-					while (!path.equals("r")) {
-						if (path.equals("quit")) {
-							quit = true;
-							return;
-						} else if (path.equals("h")) {
-							return;
-						}
-						System.out.println("Please enter a valid input");
-						path = input.nextLine();
-					}
+					if(error()) return;
 
 				} else {
 
 					if (!CITY_GRAPH.shortestPath(start, end)) {
 						System.out.println("No Route Found");
 					}
-					System.out.printf("Enter 'r' if you would like to enter different inputs \n"
-							+ "Enter 'h' to return to the home page \n");
-					input.next();
-					path = input.nextLine();
-					while (!path.equals("r")) {
-						if (path.equals("h")) {
-							return;
-						}
-						System.out.println("Please enter a valid input");
-						path = input.nextLine();
-					}
+					if(error()) return;
 				}
 			} catch (InputMismatchException e) {
-				System.out.println("Please enter a valid input");
+				if(error()) return;
 			}
 
 		}
@@ -131,51 +108,15 @@ public class BusManagementSystem {
 					} else {
 						System.out.println("There are no arrival times with time " + time);
 					}
-					System.out.printf("Enter 'r' if you would like to enter different inputs \n"
-							+ "Enter 'h' to return to the home page \n");
-					input.next();
-					path = input.nextLine();
-					while (!path.equals("r")) {
-						if (path.equals("h")) {
-							return;
-						}
-						System.out.println("Please enter a valid input");
-						path = input.nextLine();
-					}
+					if(error()) return;
 				} else {
 					System.out.println("Please enter a valid input in the format HH:MM:SS");
-					System.out.printf("Enter 'r' if you would like to try again" + "\n"
-							+ "Enter 'h' to return to the homepage" + "\n" + "Enter 'quit' to quit \n");
-					input.next();
-					path = input.nextLine();
-					while (!path.equals("r")) {
-						if (path.equals("quit")) {
-							quit = true;
-							return;
-						} else if (path.equals("h")) {
-							return;
-						}
-						System.out.println("Please enter a valid input");
-						path = input.nextLine();
-					}
+					if(error()) return;
 				}
 			} catch (NumberFormatException e) {
-				Scanner input = new Scanner(System.in);
+				
 				System.out.println("Please enter a valid input in the format HH:MM:SS");
-				System.out.printf("Enter 'r' if you would like to try again" + "\n"
-						+ "Enter 'h' to return to the homepage" + "\n" + "Enter 'quit' to quit \n");
-				input.next();
-				path = input.nextLine();
-				while (!path.equals("r")) {
-					if (path.equals("quit")) {
-						quit = true;
-						return;
-					} else if (path.equals("h")) {
-						return;
-					}
-					System.out.println("Please enter a valid input");
-					path = input.nextLine();
-				}
+				if(error()) return;
 			}
 		}
 
@@ -187,6 +128,25 @@ public class BusManagementSystem {
 
 	}
 
-	// Creates a array for trip datapoints
+	// Function called when theres an input error returns true if user chooses to return home or quit
+	public static boolean error()
+	{
+		System.out.printf("Enter 'r' if you would like to try again" + "\n"
+				+ "Enter 'h' to return to the homepage" + "\n" + "Enter 'quit' to quit \n");
+		String path;
+		Scanner input = new Scanner(System.in);
+		path = input.nextLine();
+		while (!path.equals("r")) {
+			if (path.equals("quit")) {
+				quit = true;
+				return true;
+			} else if (path.equals("h")) {
+				return true;
+			}
+			System.out.println("Please enter a valid input");
+			path = input.nextLine();
+		}
+		return false;
+	}
 
 }
