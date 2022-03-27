@@ -1,10 +1,4 @@
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -16,6 +10,7 @@ public class BusManagementSystem {
 	public static final String TRANSFERS = "transfers.txt";
 	public static final String STOP_TIMES = "stop_times.txt";
 	public static final Graph CITY_GRAPH = new Graph(STOPS, TRANSFERS, STOP_TIMES);
+	public static final TST STOPS_TST = new TST(STOPS);
 
 	public static void main(String[] args) {
 		System.out.println("Welcome to the the Bus Management System");
@@ -64,17 +59,20 @@ public class BusManagementSystem {
 							? (start + " and " + end + " are not valid stop IDs")
 							: !CITY_GRAPH.contains(start) ? (start + " is not a valid stop ID")
 									: (end + " is not a valid stop ID")));
-					if(error()) return;
+					if (!tryAgain())
+						return;
 
 				} else {
 
 					if (!CITY_GRAPH.shortestPath(start, end)) {
 						System.out.println("No Route Found");
 					}
-					if(error()) return;
+					if (!tryAgain())
+						return;
 				}
 			} catch (InputMismatchException e) {
-				if(error()) return;
+				if (!tryAgain())
+					return;
 			}
 
 		}
@@ -108,15 +106,18 @@ public class BusManagementSystem {
 					} else {
 						System.out.println("There are no arrival times with time " + time);
 					}
-					if(error()) return;
+					if (!tryAgain())
+						return;
 				} else {
 					System.out.println("Please enter a valid input in the format HH:MM:SS");
-					if(error()) return;
+					if (!tryAgain())
+						return;
 				}
 			} catch (NumberFormatException e) {
-				
+
 				System.out.println("Please enter a valid input in the format HH:MM:SS");
-				if(error()) return;
+				if (!tryAgain())
+					return;
 			}
 		}
 
@@ -124,29 +125,42 @@ public class BusManagementSystem {
 
 	// Searches for stops by name
 	public static void stopSearch() {
-		// TODO Auto-generated method stub
+		String stopToSearch; // Stop to search for
+		boolean done = false;
+		Scanner input = new Scanner(System.in);
+		while (!done) {
+			System.out.println("Enter the name of a stop you would like to search for");
+			stopToSearch = input.nextLine().trim().toUpperCase();
+			if (STOPS_TST.contains(stopToSearch)) {
+				System.out.println("Here are your results");
+				STOPS_TST.printSearch();
+			} else
+				System.out.println("Error: There's no stops that fit the search criteria");
+			if (!tryAgain())
+				return;
+		}
 
 	}
 
-	// Function called when theres an input error returns true if user chooses to return home or quit
-	public static boolean error()
-	{
-		System.out.printf("Enter 'r' if you would like to try again" + "\n"
-				+ "Enter 'h' to return to the homepage" + "\n" + "Enter 'quit' to quit \n");
+	// Function called when theres an input error or the user gets a successful
+	// search returns true if user chooses to return home or quit
+	public static boolean tryAgain() {
+		System.out.printf("Enter 'r' if you would like to try again" + "\n" + "Enter 'h' to return to the homepage"
+				+ "\n" + "Enter 'quit' to quit \n");
 		String path;
 		Scanner input = new Scanner(System.in);
 		path = input.nextLine();
 		while (!path.equals("r")) {
 			if (path.equals("quit")) {
 				quit = true;
-				return true;
+				return false;
 			} else if (path.equals("h")) {
-				return true;
+				return false;
 			}
 			System.out.println("Please enter a valid input");
 			path = input.nextLine();
 		}
-		return false;
+		return true;
 	}
 
 }
