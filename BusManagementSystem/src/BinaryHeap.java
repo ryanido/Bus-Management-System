@@ -15,6 +15,7 @@ public class BinaryHeap {
 		this.pos = new HashMap<>();
 	}
 
+	//Inserts key -value pair into heap
 	public void insert(double key, int value) {
 		if (contains(value))
 		{
@@ -27,12 +28,14 @@ public class BinaryHeap {
 		bubbleup(n++);
 	}
 
-	public void decreaseKey(double key, int value) {
+	//reduces the value of a key
+	private void decreaseKey(double key, int value) {
 		keys[pos.get(value)] = Math.min(key, keys[pos.get(value)]);
 		bubbledown(pos.get(value));
 		return;
 	}
 
+	//returns the minimum key
 	public int delMin() {
 		int min = values[0];
 		pos.remove(min);
@@ -43,6 +46,7 @@ public class BinaryHeap {
 		return min;
 	}
 
+	//returns the smallest child of p
 	private int childOf(int p) {
 		if (2 * p + 1 > n - 1)
 			return -1;
@@ -51,10 +55,12 @@ public class BinaryHeap {
 		return keys[2 * p + 1] < keys[2 * p + 2] ? 2 * p + 1 : 2 * p + 2;
 	}
 
+	//returns the parent of c
 	private int parentOf(int c) {
 		return (c % 2 == 1) ? c / 2 : c / 2 - 1;
 	}
 
+	//swaps the position of 2 key-value pairs
 	private void swap(int x, int y) {
 		double k = keys[x];
 		keys[x] = keys[y];
@@ -66,6 +72,7 @@ public class BinaryHeap {
 		pos.put(values[y], x);
 	}
 
+	//recursively decreases the position of a key value pair
 	private void bubbledown(int n) {
 		int c = childOf(n);
 		if (c == -1)
@@ -76,6 +83,7 @@ public class BinaryHeap {
 		}
 	}
 
+	//recursively increases the position of a key value pair
 	private void bubbleup(int n) {
 		int p = parentOf(n);
 		if (p == -1)
@@ -86,10 +94,12 @@ public class BinaryHeap {
 		}
 	}
 
+	//checks if the heap contains a key
 	public boolean contains(int key) {
 		return pos.containsKey(key);
 	}
 
+	//checks if a heap is empty
 	public boolean isEmpty() {
 		return n <= 0;
 	}

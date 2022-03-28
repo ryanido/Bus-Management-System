@@ -21,6 +21,7 @@ public class BusManagementSystem {
 		System.out.println("Thanks for using the system!!!");
 	}
 
+	//Homepage of application
 	public static void home() {
 		Scanner input = new Scanner(System.in);
 		System.out.printf("\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
@@ -47,7 +48,6 @@ public class BusManagementSystem {
 		boolean done = false; // Boolean for if user is done
 		int start; // start stop
 		int end; // end stop
-		String path;
 		while (!done) {
 			try {
 				Scanner input = new Scanner(System.in);
@@ -86,7 +86,6 @@ public class BusManagementSystem {
 		int h; // Arrival hour
 		int m; // Arrival minute
 		int s; // Arrival second
-		String path;
 		TripDatabase trips;
 		while (!done) {
 			try {
@@ -101,7 +100,8 @@ public class BusManagementSystem {
 				if (h < 24 && m < 60 && s < 60) {
 					trips = new TripDatabase(time.trim(), STOP_TIMES);
 					if (!trips.isEmpty()) {
-						System.out.println("Here are the trips with time " + time);
+						System.out.println("Here are the trips with time " + time + ":");
+						System.out.println("Trip ID, Arrival Time, Depature Time, Stop ID, Stop Sequence, Stop Headsign, Pick Up Type, Drop Off Type, Shape Dist Travelled" );
 						trips.printTrips();
 					} else {
 						System.out.println("There are no arrival times with time " + time);
@@ -142,7 +142,7 @@ public class BusManagementSystem {
 
 	}
 
-	// Function called when theres an input error or the user gets a successful
+	// Function called when there is an input error or the user gets a successful
 	// search returns true if user chooses to return home or quit
 	public static boolean tryAgain() {
 		System.out.printf("Enter 'r' if you would like to try again" + "\n" + "Enter 'h' to return to the homepage"

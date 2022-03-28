@@ -7,6 +7,24 @@ import java.util.ArrayList;
 public class TripDatabase {
 	private ArrayList<DataPoint> trips;
 	private final int CUTOFF = 15;
+	private final int ARRIVAL_TIME_INDEX = 1;
+	private final int DEPARTURE_TIME_INDEX = 2;
+	private final int TRIP_ID_INDEX = 0;
+
+	private class DataPoint {
+		private int tripID;
+		private String fullDetails;
+
+		public DataPoint(int tripID, String fullDetails) {
+			this.tripID = tripID;
+			this.fullDetails = fullDetails;
+		}
+
+		public String toString() {
+			return  fullDetails; //"Trip ID: " + tripID + " Stop ID" + stopID + "\n" + " Arrival Time: " + arrivalTime + " Departure Time: "
+//					+ departureTime;
+		}
+	}
 
 	public TripDatabase(String time, String stopTimes) {
 		try {
@@ -21,18 +39,17 @@ public class TripDatabase {
 			BufferedReader reader = new BufferedReader(new FileReader(stopTimes));
 			reader.readLine();
 			while ((line = reader.readLine()) != null) {
-				arrivalTime = line.split(",")[1].trim();
+				arrivalTime = line.split(",")[ARRIVAL_TIME_INDEX].trim();
 				if (time.equals(arrivalTime)) {
-					tripID = Integer.parseInt(line.split(",")[0]);
-					depatureTime = line.split(",")[2].trim();
-					stopID = Integer.parseInt(line.split(",")[3]);
+					tripID = Integer.parseInt(line.split(",")[TRIP_ID_INDEX]);
+					depatureTime = line.split(",")[DEPARTURE_TIME_INDEX].trim();
 					arrivalHour = Integer.parseInt(arrivalTime.split(":")[0]);
 					depatureHour = Integer.parseInt(depatureTime.split(":")[0]);
 					if (arrivalHour <= 24 && depatureHour <= 24)
-						trips.add(new DataPoint(tripID, arrivalTime, depatureTime, stopID));
+						trips.add(new DataPoint(tripID,line));
 				}
 			}
-			mergeSort(trips, 0, trips.size() - 1);
+			qsort(trips, 0, trips.size() - 1);
 			this.trips = trips;
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -43,52 +60,6 @@ public class TripDatabase {
 	}
 
 	// Sorting algorithms
-	// MergeSort
-	private void mergeSort(ArrayList<DataPoint> a, int lo, int hi) {
-		if (hi <= lo + CUTOFF - 1) {
-			insertionSort(a, lo, hi);
-			return;
-		}
-		if(hi > lo)
-		{
-			int mid = lo + (hi - lo) / 2;
-			mergeSort(a, lo, mid);
-			mergeSort(a, mid + 1, hi);
-			merge(a, lo, mid, hi);
-		}
-	
-
-	}
-
-	private void merge(ArrayList<DataPoint> a, int lo, int mid, int hi) {
-		int nb = mid - lo + 1;
-		int nc = hi - mid;
-		DataPoint[] b = new DataPoint[nb];
-		DataPoint[] c = new DataPoint[nc];
-		int j = 0;
-		int k = 0;
-		for (int i = 0; i < nb; i++) {
-			b[i] = a.get(lo + i);
-		}
-		for (int i = 0; i < nc; i++) {
-			c[i] = a.get(mid + 1 + i);
-		}
-		int i = lo;
-		while (j < nb && k < nc) {
-			if (b[j].tripID < c[k].tripID) {
-				a.set(i++, c[k++]);
-			} else {
-				a.set(i++, b[j++]);
-			}
-		}
-		while (j < nb) {
-			a.set(i++, b[j++]);
-		}
-		while (k < nc) {
-			a.set(i++, c[k++]);
-		}
-	}
-
 	// Insertion Sort
 	private void insertionSort(ArrayList<DataPoint> a, int lo, int hi) {
 		int j;
@@ -101,6 +72,35 @@ public class TripDatabase {
 		}
 	}
 
+	public void qsort(ArrayList<DataPoint> a, int lo,int hi)
+	{
+		if (hi <= lo + CUTOFF - 1) {
+			insertionSort(a, lo, hi);
+			return;
+		}
+		if(hi > lo)
+		{
+			int p = partition(a,lo,hi);
+			qsort(a,p+1,hi);
+			qsort(a,lo,p-1);
+		}
+	}
+	
+	public int partition(ArrayList<DataPoint> a,int lo,int hi)
+	{
+		int p = hi;
+		int l = lo;
+		for(int i = lo; i <= hi;i++)
+		{
+			if(a.get(p).tripID < a.get(i).tripID)
+			{
+				swap(a,l,i);
+				l++;
+			}
+		}
+		swap(a,l,p);
+		return l;
+	}
 	// swaps position in arraylist
 	private void swap(ArrayList<DataPoint> a, int x, int y) {
 		DataPoint tmp = a.get(x);
@@ -108,6 +108,7 @@ public class TripDatabase {
 		a.set(y, tmp);
 	}
 	
+	//checks if database is empty
 	public boolean isEmpty()
 	{
 		return trips.isEmpty();

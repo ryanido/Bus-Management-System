@@ -6,7 +6,6 @@ import java.util.HashMap;
 
 public class Graph {
 	private int nvertices, nedges; // number of vertices number of edges
-	private HashMap<String, Boolean> checkEdge; // HashMap to check for edge duplicates
 	private HashMap<Integer, Boolean> processed; // array for vertices processed
 	private HashMap<Integer, Integer> parents;// HashMap for parents(vertex preceding) of each vertex
 	private HashMap<Integer, EdgeNode> edges;// HashMap for each edge(Adjacency List)
@@ -15,6 +14,30 @@ public class Graph {
 	private HashMap<Integer, Double> stopLats;// HashMap for stop latitude
 	private HashMap<Integer, Double> stopLons;// HashMap for stop longitude
 	private BinaryHeap pq;
+	private final int STOP_ID_INDEX = 0;
+	private final int STOP_LAT_INDEX = 4;
+	private final int STOP_LON_INDEX = 5;
+	private final int STOP_NAME_INDEX = 2;
+	private final int TRIP_ID_INDEX = 0;
+	private final int FROM_INDEX = 0;
+	private final int TO_INDEX = 1;
+	private final int TYPE_INDEX = 2;
+	private final int COST_INDEX = 3;
+	private final int TIME_INDEX = 1;
+	private final int STOP_TIMES_ID_INDEX = 3;
+	
+	private class EdgeNode {
+		private int stopID;
+		private double cost; 
+		private EdgeNode next;
+		
+		public EdgeNode(int stopID, double cost)
+		{
+			this.stopID = stopID;
+			this.cost = cost;
+			this.next = null;			
+		}
+	}
 
 	public Graph(String stops, String transfers, String stopTimes) {
 		BufferedReader reader;
@@ -34,16 +57,15 @@ public class Graph {
 			this.stopLats = new HashMap<>();
 			this.stopLons = new HashMap<>();
 			this.processed = new HashMap<>();
-			this.checkEdge = new HashMap<>();
 			this.parents = new HashMap<>();
 			this.distTo = new HashMap<>();
 			reader.readLine();
 			// Adding stopnames and longitude and latitude of each stop
 			while ((line = reader.readLine()) != null) {
-				stopID = Integer.parseInt(line.split(",")[0]);
-				stopLat = Double.parseDouble(line.split(",")[4]);
-				stopLon = Double.parseDouble(line.split(",")[5]);
-				stopName = line.split(",")[2];
+				stopID = Integer.parseInt(line.split(",")[STOP_ID_INDEX]);
+				stopLat = Double.parseDouble(line.split(",")[STOP_LAT_INDEX]);
+				stopLon = Double.parseDouble(line.split(",")[STOP_LON_INDEX]);
+				stopName = line.split(",")[STOP_NAME_INDEX];
 				stopNames.put(stopID, stopName);
 				stopLats.put(stopID, stopLat);
 				stopLons.put(stopID, stopLon);
@@ -60,10 +82,10 @@ public class Graph {
 			int timeA;
 			int timeB;
 			while ((line = reader.readLine()) != null) {
-				from = Integer.parseInt(line.split(",")[0]);
-				to = Integer.parseInt(line.split(",")[1]);
-				type = Integer.parseInt(line.split(",")[2]);
-				cost = type == 0 ? 2 : (double) Integer.parseInt(line.split(",")[3]) / 100;
+				from = Integer.parseInt(line.split(",")[FROM_INDEX]);
+				to = Integer.parseInt(line.split(",")[TO_INDEX]);
+				type = Integer.parseInt(line.split(",")[TYPE_INDEX]);
+				cost = type == 0 ? 2 : (double) Integer.parseInt(line.split(",")[COST_INDEX]) / 100;
 				addEdge(from, to, cost);
 			}
 			// Adding edges from stop_times.txt
@@ -74,13 +96,13 @@ public class Graph {
 			int tripIDA;
 			int tripIDB;
 			while ((lineB = reader.readLine()) != null) {
-				from = Integer.parseInt(line.split(",")[3]);
-				to = Integer.parseInt(lineB.split(",")[3]);
-				tripIDA = Integer.parseInt(line.split(",")[0]);
-				tripIDB = Integer.parseInt(lineB.split(",")[0]);
+				from = Integer.parseInt(line.split(",")[STOP_TIMES_ID_INDEX]);
+				to = Integer.parseInt(lineB.split(",")[STOP_TIMES_ID_INDEX]);
+				tripIDA = Integer.parseInt(line.split(",")[TRIP_ID_INDEX]);
+				tripIDB = Integer.parseInt(lineB.split(",")[TRIP_ID_INDEX]);
 				//checking for invalid inputs
-				timeA = Integer.parseInt(line.split(",")[1].split(":")[0].trim());
-				timeB = Integer.parseInt(line.split(",")[1].split(":")[1].trim());
+				timeA = Integer.parseInt(line.split(",")[TIME_INDEX].split(":")[0].trim());
+				timeB = Integer.parseInt(lineB.split(",")[TIME_INDEX].split(":")[0].trim());
 				if (tripIDA == tripIDB && timeA < 25 && timeB < 25)
 					addEdge(from, to, 1);
 				line = lineB;
@@ -97,10 +119,8 @@ public class Graph {
 	// add Edge to graph
 	public void addEdge(int start, int end, double weight) {
 		String edge = "(" + start + "," + end + ")";
-//		if(checkEdge.containsKey(edge) && checkEdge.get(edge)) return;
 		EdgeNode tmp = new EdgeNode(end, weight);
 		tmp.next = edges.get(start);
-		checkEdge.put(edge, true);
 		edges.put(start, tmp);
 		nedges++;
 	}
@@ -114,7 +134,7 @@ public class Graph {
 			reader.readLine();
 			this.pq = new BinaryHeap(nedges);
 			while ((line = reader.readLine()) != null) {
-				stopID = Integer.parseInt(line.split(",")[0]);
+				stopID = Integer.parseInt(line.split(",")[STOP_ID_INDEX]);
 				this.processed.put(stopID, false);
 				this.parents.put(stopID, -1);
 				this.distTo.put(stopID, Double.POSITIVE_INFINITY);
@@ -131,36 +151,36 @@ public class Graph {
 		return edges.containsKey(id);
 	}
 
-	// Djikstra shortest path
-	public boolean Djikstra(int start, int end) {
-		initSearch();
-		int v = -1; // vertex
-		distTo.put(start, 0.0);
-		pq.insert(distTo.get(start), start);
-		while (!pq.isEmpty() && v != end) {
-			v = pq.delMin();
-			relax(v);
-		}
-		if (processed.get(end)) {
-			System.out.printf("\nHere is the route \nFrom:" + start + ":" + stopNames.get(start) + "\n" + "To" + ":"
-					+ end + ":" + stopNames.get(end) + "\n" + "Cost: %2d",distTo.get(end));
-			printPath(start, end);
-			return true;
-		}
-		return false;
-	}
-
-	private void relax(int v) {
-		for (EdgeNode tmp = edges.get(v); tmp != null; tmp = tmp.next) {
-			int w = tmp.stopID;
-			if (distTo.get(w) > distTo.get(v) + tmp.cost) {
-				distTo.put(w, distTo.get(v) + tmp.cost);
-				parents.put(w, v);
-				pq.insert(distTo.get(w), w);
-			}
-		}
-		processed.put(v, true);
-	}
+//	// Djikstra shortest path
+//	public boolean Djikstra(int start, int end) {
+//		initSearch();
+//		int v = -1; // vertex
+//		distTo.put(start, 0.0);
+//		pq.insert(distTo.get(start), start);
+//		while (!pq.isEmpty() && v != end) {
+//			v = pq.delMin();
+//			relax(v);
+//		}
+//		if (processed.get(end)) {
+//			System.out.printf("\nHere is the route \nFrom:" + start + ":" + stopNames.get(start) + "\n" + "To" + ":"
+//					+ end + ":" + stopNames.get(end) + "\n" + "Cost: %2d",distTo.get(end));
+//			printPath(start, end);
+//			return true;
+//		}
+//		return false;
+//	}
+//
+//	private void relax(int v) {
+//		for (EdgeNode tmp = edges.get(v); tmp != null; tmp = tmp.next) {
+//			int w = tmp.stopID;
+//			if (distTo.get(w) > distTo.get(v) + tmp.cost) {
+//				distTo.put(w, distTo.get(v) + tmp.cost);
+//				parents.put(w, v);
+//				pq.insert(distTo.get(w), w);
+//			}
+//		}
+//		processed.put(v, true);
+//	}
 
 	// A* shortest path
 	public boolean shortestPath(int start, int end) {
@@ -213,6 +233,7 @@ public class Graph {
 		return result;
 	}
 
+	//prints path of shortest path
 	private void printPath(int start, int end) {
 		if (start != end) {
 			printPath(start, parents.get(end));

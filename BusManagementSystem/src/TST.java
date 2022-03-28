@@ -49,16 +49,13 @@ public class TST {
 		return adjName;
 	}
 
-	public int size() {
-		return n;
-	}
-
+	// checks if tree contains key
 	public boolean contains(String key) {
 		return get(key) != null;
 	}
 
 	// Returns list of strings that start with the inputted key
-	public Set<String> get(String key) {
+	private Set<String> get(String key) {
 
 		Node subtrieRoot = get(root, key, 0);
 		if (subtrieRoot == null)
@@ -94,7 +91,8 @@ public class TST {
 			return tmp;
 	}
 
-	public void put(String key, String val) {
+	//puts key and value into tree
+	private void put(String key, String val) {
 		if (key == null) {
 			throw new IllegalArgumentException("key is null for put()");
 		}
@@ -105,6 +103,7 @@ public class TST {
 		root = put(root, key, val, 0);
 	}
 
+	//recursively adds each letter in the key into tree and associates the keys value with that letter
 	private Node put(Node tmp, String key, String val, int pos) {
 		char c = key.charAt(pos);
 		if (tmp == null) {
