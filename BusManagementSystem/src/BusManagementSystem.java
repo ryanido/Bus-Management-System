@@ -11,7 +11,6 @@ public class BusManagementSystem {
 	public static final String STOP_TIMES = "stop_times.txt";
 	public static final Graph CITY_GRAPH = new Graph(STOPS, TRANSFERS, STOP_TIMES);
 	public static final TST STOPS_TST = new TST(STOPS);
-
 	public static void main(String[] args) {
 		System.out.println("Welcome to the the Bus Management System");
 
@@ -52,6 +51,7 @@ public class BusManagementSystem {
 			try {
 				Scanner input = new Scanner(System.in);
 				System.out.println("Enter the start and end stop IDs separated by a ' ':");
+				
 				start = input.nextInt();
 				end = input.nextInt();
 				if (!(CITY_GRAPH.contains(start) && CITY_GRAPH.contains(end))) {
@@ -86,18 +86,22 @@ public class BusManagementSystem {
 		int h; // Arrival hour
 		int m; // Arrival minute
 		int s; // Arrival second
+		int hl; // length of arrival hour string
 		TripDatabase trips;
 		while (!done) {
 			try {
 				Scanner input = new Scanner(System.in);
 				System.out.println("Please enter the arrival time for the trip in the format HH:MM:SS");
 				time = input.next();
+				
 				// if input is not in format or does not have all of hh mm and ss display error
 				// message
 				h = time.split(":").length == 3 ? Integer.parseInt(time.split(":")[0]) : 24;
 				m = time.split(":").length == 3 ? Integer.parseInt(time.split(":")[1]) : 60;
 				s = time.split(":").length == 3 ? Integer.parseInt(time.split(":")[2]) : 60;
-				if (h < 24 && m < 60 && s < 60) {
+				hl = time.split(":")[0].length();
+				if (h < 24 && m < 60 && s < 60 ) {
+					if(hl == 2 && h < 10) time = time.substring(1);
 					trips = new TripDatabase(time.trim(), STOP_TIMES);
 					if (!trips.isEmpty()) {
 						System.out.println("Here are the trips with time " + time + ":");
